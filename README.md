@@ -60,14 +60,14 @@ docker ps
 1. **Clone the repository:**
 ```bash
 cd ~
-git clone <your-repo-url>
+git clone <git@github.com:mehdibounouif/inception.git>
 cd inception
 ```
 
 2. **Configure your domain in `/etc/hosts`:**
 ```bash
-# Replace 'mehdibounouif' with YOUR 42 login
-sudo bash -c 'echo "127.0.0.1 mehdibounouif.42.fr" >> /etc/hosts'
+# Replace 'mbounoui' with YOUR 42 login
+sudo bash -c 'echo "127.0.0.1 mbounoui.42.fr" >> /etc/hosts'
 
 # Verify it was added
 cat /etc/hosts | grep 42.fr
@@ -338,7 +338,7 @@ docker ps
 ```bash
 # Clone project
 cd ~
-git clone <your-repo>
+git clone <git@github.com:mehdibounouif/inception.git>
 cd inception
 
 # Configure domain
@@ -620,46 +620,6 @@ docker inspect <container>         # View container details
 docker stats                       # View resource usage
 docker top <container>             # View running processes
 ```
-
-### AI Usage
-
-AI (Claude) was used extensively throughout this project for:
-
-**Understanding Concepts:**
-- Docker fundamentals and best practices
-- Container networking and volume management
-- Difference between VMs and containers
-- Docker Compose orchestration
-- TLS/SSL certificate management
-
-**Code Generation:**
-- Initial Dockerfile templates
-- Shell script structures (init-db.sh, setup-wordpress.sh)
-- NGINX configuration templates
-- Docker Compose YAML structure
-
-**Debugging and Problem-Solving:**
-- Container restart issues
-- Network connectivity problems
-- Volume mounting errors
-- Database initialization bugs
-- Permission issues
-
-**Documentation:**
-- README structure and content
-- Troubleshooting guides
-- Technical comparisons
-- Step-by-step tutorials
-
-**How AI Was Used Responsibly:**
-- All AI-generated code was reviewed line-by-line
-- Code was tested extensively before use
-- Understanding was verified through debugging
-- Documentation was customized for this specific project
-- AI explanations helped build fundamental knowledge
-
-**All final code and documentation represents my understanding and has been fully tested and debugged.**
-
 ## Testing Before Submission
 
 ### Pre-Submission Checklist
