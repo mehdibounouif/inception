@@ -1,17 +1,31 @@
+# Detect which docker compose command to use
+DOCKER_COMPOSE := $(shell which docker-compose 2>/dev/null)
+ifeq ($(DOCKER_COMPOSE),)
+	DOCKER_COMPOSE := docker compose
+else
+	DOCKER_COMPOSE := docker-compose
+endif
+
 all: up
 
 up:
-	@mkdir -p /home/${USER}/data/db
-	@mkdir -p /home/${USER}/data/wordpress
-	@docker-compose -f srcs/docker-compose.yml up -d --build
+	@mkdir -p $(HOME)/data/db
+	@mkdir -p $(HOME)/data/wordpress
+	@$(DOCKER_COMPOSE) -f srcs/docker-compose.yml up -d --build
 
 down:
-	@docker-compose -f srcs/docker-compose.yml down
+	@$(DOCKER_COMPOSE) -f srcs/docker-compose.yml down
 
 clean: down
 	@docker system prune -af
-	@sudo rm -rf /home/${USER}/data
+	@sudo rm -rf $(HOME)/data
 
 re: clean all
 
-.PHONY: all up down clean re
+logs:
+	@$(DOCKER_COMPOSE) -f srcs/docker-compose.yml logs -f
+
+status:
+	@docker ps
+
+.PHONY: all up down clean re logs status

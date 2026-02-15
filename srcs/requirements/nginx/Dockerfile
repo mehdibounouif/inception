@@ -10,8 +10,11 @@ RUN apt-get update && apt-get install -y \
 COPY conf/nginx.conf /etc/nginx/nginx.conf
 
 # Copy SSL certificate generation script
-COPY tools/generate-ssl.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/generate-ssl.sh && \
+COPY tools/generate-ssl.sh /usr/local/bin/generate-ssl.sh
+RUN chmod +x /usr/local/bin/generate-ssl.sh
+
+# Create SSL directory and generate certificate
+RUN mkdir -p /etc/nginx/ssl && \
     /usr/local/bin/generate-ssl.sh
 
 EXPOSE 443

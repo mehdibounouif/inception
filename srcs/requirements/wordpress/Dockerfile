@@ -1,6 +1,6 @@
 FROM debian:bullseye
 
-# Install PHP-FPM and WordPress dependencies
+# Install PHP-FPM, WordPress dependencies, and MariaDB client
 RUN apt-get update && apt-get install -y \
     php7.4-fpm \
     php7.4-mysql \
@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y \
     php7.4-zip \
     wget \
     curl \
+    mariadb-client \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Configure PHP-FPM to listen on port 9000
@@ -18,8 +20,14 @@ RUN sed -i 's/listen = \/run\/php\/php7.4-fpm.sock/listen = 9000/' \
     /etc/php/7.4/fpm/pool.d/www.conf
 
 # Copy setup script
-COPY tools/setup-wordpress.sh /usr/local/bin/
+COPY tools/setup-wordpress.sh /usr/local/bin/setup-wordpress.sh
 RUN chmod +x /usr/local/bin/setup-wordpress.sh
+
+# Create web directory
+RUN mkdir -p /var/www/html && \
+    chown -R www-data:www-data /var/www/html
+
+WORKDIR /var/www/html
 
 EXPOSE 9000
 
