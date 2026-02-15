@@ -60,7 +60,7 @@ docker ps
 1. **Clone the repository:**
 ```bash
 cd ~
-git clone <git@github.com:mehdibounouif/inception.git>
+git clone git@github.com:mehdibounouif/inception.git
 cd inception
 ```
 
