@@ -1,3 +1,9 @@
+# The Orchestration Blueprint:
+# it defines all three containers,
+# how they're built,
+# how they connect,
+# and where their data lives
+
 services:
   mariadb:
     build: ./requirements/mariadb
