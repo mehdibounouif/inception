@@ -65,7 +65,7 @@ else
     echo "WordPress already configured, skipping setup..."
 fi
 
-# Create necessary directories for PHP-FPM
+# PHP-FPM needs this directory to exist for its internal process management files 
 mkdir -p /run/php
 
 # Start PHP-FPM in foreground
