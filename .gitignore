@@ -1,0 +1,16 @@
+# Environment variables — NEVER commit credentials
+srcs/.env
+.env
+
+# OS artefacts
+.DS_Store
+Thumbs.db
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker build cache artefacts
+**/.docker-*
