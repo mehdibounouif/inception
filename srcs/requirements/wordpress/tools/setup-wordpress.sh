@@ -1,4 +1,3 @@
-
 #!/bin/bash
 # ============================================================
 # setup-wordpress.sh — install WordPress and configure Redis cache

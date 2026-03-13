@@ -27,6 +27,10 @@ RUN apt-get update && apt-get install -y \
 	# Deletes the apt package cache to reduce image size
     && rm -rf /var/lib/apt/lists/*
 
+RUN wget -q https://github.com/wp-cli/wp-cli/releases/download/v2.10.0/wp-cli-2.10.0.phar \
+    -O /usr/local/bin/wp \
+    && chmod +x /usr/local/bin/wp
+
 # Configure PHP-FPM to listen on port 9000
 RUN sed -i 's/listen = \/run\/php\/php7.4-fpm.sock/listen = 9000/' \
     /etc/php/7.4/fpm/pool.d/www.conf
