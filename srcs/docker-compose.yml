@@ -1,0 +1,220 @@
+
+# ============================================================
+# docker-compose.yml — Inception project (mandatory + bonus)
+# ============================================================
+# Service dependency chain (what depends on what):
+#
+#   mariadb ←── wordpress ←── nginx (sole TLS entrypoint :443)
+#   mariadb ←── adminer
+#   redis   ←── wordpress
+#   (ftp, website, portainer are independent of each other)
+#
+# All services share one Docker bridge network: inception.
+# No service is reachable from the host except nginx (:443),
+# ftp (:21, :21100-21110), and portainer (:9000 via nginx).
+# ============================================================
+
+services:
+
+  # ----------------------------------------------------------
+  # MANDATORY SERVICES
+  # ----------------------------------------------------------
+
+  mariadb:
+    build: ./requirements/mariadb
+    container_name: mariadb
+    env_file: .env
+    # The MariaDB data files live in this named volume.
+    # driver_opts bind maps it to ~/data/db on the host so the
+    # evaluator can verify data persistence outside Docker.
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - inception
+    # restart: always means Docker restarts the container
+    # automatically if it crashes or if the host reboots.
+    restart: always
+
+  wordpress:
+    build: ./requirements/wordpress
+    container_name: wordpress
+    env_file: .env
+    depends_on:
+      # Docker starts mariadb before wordpress and redis before
+      # wordpress. Note: depends_on only controls START ORDER,
+      # not "ready" state — setup-wordpress.sh polls MariaDB
+      # directly until it accepts connections.
+      - mariadb
+      - redis        # ← bonus: WordPress needs Redis running first
+    volumes:
+      # WordPress source files go here. Shared with nginx so
+      # nginx can serve static assets (images, CSS) directly.
+      - wp_data:/var/www/html
+    networks:
+      - inception
+    restart: always
+
+  nginx:
+    build: ./requirements/nginx
+    container_name: nginx
+    env_file: .env
+    depends_on:
+      - wordpress
+      - website      # ← bonus: nginx proxies /portfolio/ here
+      - adminer      # ← bonus: nginx proxies /adminer/ here
+      - portainer    # ← bonus: nginx proxies /portainer/ here
+    ports:
+      # The ONLY port exposed to the host. All HTTPS traffic enters
+      # here. Every other service is reachable only via this proxy.
+      - "443:443"
+    volumes:
+      # nginx serves WordPress static files (images, CSS, JS)
+      # directly without going through php-fpm, for performance.
+      - wp_data:/var/www/html
+    networks:
+      - inception
+    restart: always
+
+  # ----------------------------------------------------------
+  # BONUS SERVICE 1 — Redis cache
+  # ----------------------------------------------------------
+
+  redis:
+    build: ./requirements/bonus/redis
+    container_name: redis
+    # No env_file needed — Redis needs no credentials.
+    # No ports: block — Redis must NOT be reachable from the host.
+    # It listens on 6379 inside the inception network only.
+    # No volume — Redis is a pure cache. If it restarts, WordPress
+    # rebuilds the cache on the next few requests automatically.
+    networks:
+      - inception
+    restart: always
+
+  # ----------------------------------------------------------
+  # BONUS SERVICE 2 — FTP server (vsftpd)
+  # ----------------------------------------------------------
+
+  ftp:
+    build: ./requirements/bonus/ftp
+    container_name: ftp
+    env_file: .env
+    # FTP_USER and FTP_PASSWORD are read from .env at runtime
+    # by setup-ftp.sh to create the OS user inside the container.
+    ports:
+      # Port 21: FTP control connection (login, commands like LIST, STOR).
+      - "21:21"
+      # Ports 21100-21110: passive mode data connections (file content).
+      # FTP uses a SECOND connection for actual data transfer.
+      # Passive mode means the server opens these ports and the client
+      # connects to them — this works through Docker's NAT.
+      # Active mode (server connects back to client) does NOT work in Docker.
+      - "21100-21110:21100-21110"
+    volumes:
+      # Mount the SAME volume as WordPress so uploaded files
+      # appear on the website instantly.
+      - wp_data:/var/www/html
+    networks:
+      - inception
+    restart: always
+
+  # ----------------------------------------------------------
+  # BONUS SERVICE 3 — Static website (pure HTML/CSS/JS, no PHP)
+  # ----------------------------------------------------------
+
+  website:
+    build: ./requirements/bonus/website
+    container_name: website
+    # No env_file, no ports exposed to host, no volumes.
+    # This service is completely self-contained; its only connection
+    # to the outside world is through the main nginx proxy.
+    networks:
+      - inception
+    restart: always
+
+  # ----------------------------------------------------------
+  # BONUS SERVICE 4 — Adminer (database management UI)
+  # ----------------------------------------------------------
+
+  adminer:
+    build: ./requirements/bonus/adminer
+    container_name: adminer
+    depends_on:
+      # MariaDB must be running before Adminer starts, or the
+      # login page will show a connection error on first load.
+      - mariadb
+    # No ports: — Adminer is NOT exposed directly to the host.
+    # All traffic goes through main nginx → adminer:9000 (FastCGI).
+    # Exposing Adminer directly would bypass the "nginx is sole
+    # entrypoint" rule and is a security risk in any real system.
+    networks:
+      - inception
+    restart: always
+
+  # ----------------------------------------------------------
+  # BONUS SERVICE 5 — Portainer (Docker management dashboard)
+  # ----------------------------------------------------------
+
+  portainer:
+    build: ./requirements/bonus/portainer
+    container_name: portainer
+    volumes:
+      # portainer_data stores Portainer's internal database:
+      # admin user credentials, endpoint settings, etc.
+      # Without this volume, every container restart resets Portainer
+      # to factory defaults and you must re-run the setup wizard.
+      - portainer_data:/data
+      # /var/run/docker.sock is the Unix socket that Docker uses for
+      # its API. Mounting it gives Portainer full control of the local
+      # Docker engine — it can list/start/stop/inspect everything.
+      # This is a privileged mount; acceptable in a local eval environment.
+      - /var/run/docker.sock:/var/run/docker.sock
+    # No ports: — routed through main nginx at /portainer/
+    networks:
+      - inception
+    restart: always
+
+# ============================================================
+# VOLUMES
+# ============================================================
+
+volumes:
+
+  # WordPress database files.
+  # device path must exist on the host before "docker compose up".
+  # The Makefile's "up" target runs "mkdir -p ~/data/db" for this.
+  db_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOME}/data/db
+
+  # WordPress source files. Shared between wordpress, nginx, and ftp.
+  # The Makefile creates ~/data/wordpress before starting containers.
+  wp_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOME}/data/wordpress
+
+  # Portainer's internal database (users, settings, endpoint config).
+  # Stored in Docker's default volume location (/var/lib/docker/volumes/).
+  # No bind mount needed — this data does not need to be on a specific
+  # host path; it just needs to survive container restarts.
+  portainer_data:
+    driver: local
+
+# ============================================================
+# NETWORKS
+# ============================================================
+
+networks:
+  inception:
+    # bridge: all containers on this network can reach each other
+    # by service name (e.g. "mariadb", "redis") via Docker's
+    # built-in DNS. No container can reach the host network directly.
+    driver: bridge
+
+

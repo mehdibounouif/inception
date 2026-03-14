@@ -35,7 +35,9 @@ FROM debian:bullseye
 # ca-certificates — allows wget to verify GitHub's HTTPS certificate
 RUN apt-get update && apt-get install -y \
     --no-install-recommends \
+    # PHP process manager
     php7.4-fpm \
+    # MySQL driver so that PHP file can open a connection to MariaDB
     php7.4-mysql \
     wget \
     ca-certificates \
