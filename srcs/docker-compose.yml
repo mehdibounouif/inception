@@ -91,10 +91,6 @@ services:
       - inception
     restart: always
 
-  # ----------------------------------------------------------
-  # BONUS SERVICE 3 — Static website (pure HTML/CSS/JS, no PHP)
-  # ----------------------------------------------------------
-
   website:
     build: ./requirements/bonus/website
     container_name: website
