@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-# DOMAIN_NAME is available here because we are at runtime, not build time.
-# Fall back to a placeholder if somehow unset.
 DOMAIN=${DOMAIN_NAME:-localhost}
 
 # Generate the self-signed TLS certificate with the correct CN.
