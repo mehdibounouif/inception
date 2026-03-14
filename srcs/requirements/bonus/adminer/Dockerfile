@@ -65,11 +65,11 @@ RUN chown -R www-data:www-data /var/www/adminer
 
 # The entrypoint script ensures the php-fpm runtime directory exists
 # then starts php-fpm. This mirrors the pattern used in WordPress.
-COPY tools/start-adminer.sh /usr/local/bin/start-adminer.sh
-RUN chmod +x /usr/local/bin/start-adminer.sh
+COPY tools/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Port 9000 — FastCGI, reachable only inside the inception network.
 # The main nginx connects here; the host never sees this port.
 EXPOSE 9000
 
-ENTRYPOINT ["/usr/local/bin/start-adminer.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
