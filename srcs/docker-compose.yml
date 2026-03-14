@@ -91,32 +91,6 @@ services:
       - inception
     restart: always
 
-  # ----------------------------------------------------------
-  # BONUS SERVICE 2 — FTP server (vsftpd)
-  # ----------------------------------------------------------
-
-  ftp:
-    build: ./requirements/bonus/ftp
-    container_name: ftp
-    env_file: .env
-    # FTP_USER and FTP_PASSWORD are read from .env at runtime
-    # by setup-ftp.sh to create the OS user inside the container.
-    ports:
-      # Port 21: FTP control connection (login, commands like LIST, STOR).
-      - "21:21"
-      # Ports 21100-21110: passive mode data connections (file content).
-      # FTP uses a SECOND connection for actual data transfer.
-      # Passive mode means the server opens these ports and the client
-      # connects to them — this works through Docker's NAT.
-      # Active mode (server connects back to client) does NOT work in Docker.
-      - "21100-21110:21100-21110"
-    volumes:
-      # Mount the SAME volume as WordPress so uploaded files
-      # appear on the website instantly.
-      - wp_data:/var/www/html
-    networks:
-      - inception
-    restart: always
 
   # ----------------------------------------------------------
   # BONUS SERVICE 3 — Static website (pure HTML/CSS/JS, no PHP)
