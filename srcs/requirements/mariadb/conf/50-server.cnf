@@ -1,9 +1,17 @@
 [mysqld]
+
 user            = mysql
+
 pid-file        = /run/mysqld/mysqld.pid
+
+# init-db.sh can connect without credentials at the beginning
 socket          = /run/mysqld/mysqld.sock
 port            = 3306
+
+# mariadb's program files
 basedir         = /usr
+
+# actual database data files
 datadir         = /var/lib/mysql
 
 # Allow connections from other containers

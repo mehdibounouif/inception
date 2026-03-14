@@ -6,7 +6,7 @@ chown -R mysql:mysql /run/mysqld
 
 # Check if database is already initialized
 if [ ! -d "/var/lib/mysql/mysql" ]; then
- k  echo "Initializing MariaDB database..."
+    echo "Initializing MariaDB database..."
     # Initialize the database
 	# Creates the system directory structure inside /var/lib/mysql/
 	# Creates the internal mysql database with all the system tables
@@ -34,6 +34,8 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 -- Secure the installation
 DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+
+-- Removes the default test database that MariaDB creates
 DROP DATABASE IF EXISTS test;
 DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
 

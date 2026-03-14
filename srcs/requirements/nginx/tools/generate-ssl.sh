@@ -32,7 +32,6 @@
 #	# Organization: 42
 #	# Organization Unit: 42
 #	# Common Name: mehdibounouif.42.fr
-#    -subj "/C=MA/ST=Casa/L=Casablanca/O=42/OU=42/CN=mehdibounouif.42.fr"
 
 
 
@@ -48,4 +47,4 @@ openssl req -x509 -nodes -days 365 \
     -newkey rsa:2048 \
     -keyout "${SSL_DIR}/nginx.key" \
     -out    "${SSL_DIR}/nginx.crt" \
-    -subj   "/C=FR/ST=IDF/L=Paris/O=42/CN=${DOMAIN}"
+    -subj "/C=MA/ST=Casa/L=Casablanca/O=42/OU=42/CN=mehdibounouif.42.fr"
