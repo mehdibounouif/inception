@@ -95,4 +95,4 @@ mkdir -p /run/php
 
 echo "Starting php-fpm..."
 
-exec php-fpm7.4 -F
+exec php-fpm8.2 -F

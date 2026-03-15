@@ -2,6 +2,8 @@
 srcs/.env
 .env
 
+secrets/*.txt
+
 # OS artefacts
 .DS_Store
 Thumbs.db

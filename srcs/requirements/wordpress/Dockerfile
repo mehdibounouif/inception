@@ -1,21 +1,21 @@
-FROM debian:bullseye
+FROM debian:bookworm
 
 # Install PHP-FPM, WordPress dependencies, and MariaDB client
 RUN apt-get update && apt-get install -y \
 	# PHP-FPM stands for FastCGI Process Manager
-    php7.4-fpm \
+    php8.2-fpm \
     # A PHP extension that allows PHP code to talk to MySQL/MariaDB databases
-    php7.4-mysql \
+    php8.2-mysql \
 	# A PHP extension that allows PHP to make HTTP requests to other servers
-    php7.4-curl \
+    php8.2-curl \
 	# GD stands for Graphics Draw. This PHP extension handles image manipulation.
-    php7.4-gd \
+    php8.2-gd \
 	# handles MB stands for Multi-Byte string 
-    php7.4-mbstring \
+    php8.2-mbstring \
 	# Allows PHP to parse and generate XML
-    php7.4-xml \
+    php8.2-xml \
 	# Allows PHP to read and create ZIP files
-    php7.4-zip \
+    php8.2-zip \
 	# A command-line tool for downloading files from the internet via HTTP/HTTPS
     wget \
 	# Another command-line download tool, similar to wget but more versatile.
@@ -32,8 +32,8 @@ RUN wget -q https://github.com/wp-cli/wp-cli/releases/download/v2.10.0/wp-cli-2.
     && chmod +x /usr/local/bin/wp
 
 # Configure PHP-FPM to listen on port 9000
-RUN sed -i 's/listen = \/run\/php\/php7.4-fpm.sock/listen = 9000/' \
-    /etc/php/7.4/fpm/pool.d/www.conf
+RUN sed -i 's/listen = \/run\/php\/php8.2-fpm.sock/listen = 9000/' \
+    /etc/php/8.2/fpm/pool.d/www.conf
 
 # Copy setup script
 COPY tools/setup-wordpress.sh /usr/local/bin/setup-wordpress.sh
