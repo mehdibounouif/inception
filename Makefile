@@ -18,7 +18,6 @@ all: up
 up:
 	@mkdir -p $(HOME)/data/db
 	@mkdir -p $(HOME)/data/wordpress
-	@mkdir -p $(HOME)/data/portainer
 	@$(DOCKER_COMPOSE) -f srcs/docker-compose.yml up -d --build
 
 # Stop and remove containers and the default network.
