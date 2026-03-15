@@ -1,7 +1,4 @@
-# ── Detect which docker compose command is available ──────────────────────────
-# Newer Docker ships "docker compose" (plugin form).
-# Older systems have the standalone "docker-compose" binary.
-# We prefer the standalone binary if found, otherwise fall back to the plugin.
+#  Detect which docker compose command is available 
 DOCKER_COMPOSE := $(shell which docker-compose 2>/dev/null)
 ifeq ($(DOCKER_COMPOSE),)
 	DOCKER_COMPOSE := docker compose
@@ -25,7 +22,7 @@ up:
 down:
 	@$(DOCKER_COMPOSE) -f srcs/docker-compose.yml down
 
-# Full teardown:
+
 #   docker system prune -af    removes stopped containers, unused images,
 #                               build cache, and dangling volumes.
 #   rm -rf $(HOME)/data        removes the host-side volume data.

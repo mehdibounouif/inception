@@ -5,15 +5,10 @@ services:
     build: ./requirements/mariadb
     container_name: mariadb
     env_file: .env
-    # The MariaDB data files live in this named volume.
-    # driver_opts bind maps it to ~/data/db on the host so the
-    # evaluator can verify data persistence outside Docker.
     volumes:
       - db_data:/var/lib/mysql
     networks:
       - inception
-    # restart: always means Docker restarts the container
-    # automatically if it crashes or if the host reboots.
     restart: always
 
   wordpress:
@@ -21,14 +16,8 @@ services:
     container_name: wordpress
     env_file: .env
     depends_on:
-      # Docker starts mariadb before wordpress and redis before
-      # wordpress. Note: depends_on only controls START ORDER,
-      # not "ready" state — setup-wordpress.sh polls MariaDB
-      # directly until it accepts connections.
       - mariadb
     volumes:
-      # WordPress source files go here. Shared with nginx so
-      # nginx can serve static assets (images, CSS) directly.
       - wp_data:/var/www/html
     networks:
       - inception
@@ -41,12 +30,8 @@ services:
     depends_on:
       - wordpress
     ports:
-      # The ONLY port exposed to the host. All HTTPS traffic enters
-      # here. Every other service is reachable only via this proxy.
       - "443:443"
     volumes:
-      # nginx serves WordPress static files (images, CSS, JS)
-      # directly without going through php-fpm, for performance.
       - wp_data:/var/www/html
     networks:
       - inception
@@ -54,9 +39,6 @@ services:
 
 volumes:
 
-  # WordPress database files.
-  # device path must exist on the host before "docker compose up".
-  # The Makefile's "up" target runs "mkdir -p ~/data/db" for this.
   db_data:
     driver: local
     driver_opts:
@@ -64,8 +46,6 @@ volumes:
       o: bind
       device: ${HOME}/data/db
 
-  # WordPress source files. Shared between wordpress, nginx, and ftp.
-  # The Makefile creates ~/data/wordpress before starting containers.
   wp_data:
     driver: local
     driver_opts:
@@ -76,8 +56,5 @@ volumes:
 
 networks:
   inception:
-    # bridge: all containers on this network can reach each other
-    # by service name (e.g. "mariadb", "redis") via Docker's
-    # built-in DNS. No container can reach the host network directly.
     driver: bridge
 

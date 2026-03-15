@@ -7,16 +7,11 @@ chown -R mysql:mysql /run/mysqld
 # Check if database is already initialized
 if [ ! -d "/var/lib/mysql/mysql" ]; then
     echo "Initializing MariaDB database..."
-    # Initialize the database
-	# Creates the system directory structure inside /var/lib/mysql/
-	# Creates the internal mysql database with all the system tables
-	# Creates the performance_schema database for monitoring
-	# Sets up the initial root account with no password
+    # Initialize the database (create root without pass, tables)
     mysql_install_db --user=mysql --datadir=/var/lib/mysql
 
     # Start MariaDB in background
     mysqld --user=mysql --datadir=/var/lib/mysql &
-    mysql_pid=$!
    
     echo "Waiting for MariaDB to start..."
     # Wait for MariaDB to be ready
