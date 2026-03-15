@@ -1,10 +1,9 @@
+#!/bin/bash
 
 set -e
 # ----------------------------------------------------------
-# Step 1: Wait for MariaDB to accept connections
+# Wait for MariaDB to accept connections
 # ----------------------------------------------------------
-# MariaDB takes a few seconds to initialise on first run.
-# We poll it with "mysqladmin ping" until it responds or we time out.
 
 echo "Waiting for MariaDB to be ready..."
 max_tries=30
@@ -26,7 +25,7 @@ fi
 
 
 # ----------------------------------------------------------
-# Step 3: Download WordPress core
+# Download WordPress core
 # ----------------------------------------------------------
 
 cd /var/www/html
@@ -41,7 +40,7 @@ if [ ! -f wp-login.php ]; then
 fi
 
 # ----------------------------------------------------------
-# Step 4: Create wp-config.php
+# Create wp-config.php
 # ----------------------------------------------------------
 
 if [ ! -f wp-config.php ]; then
@@ -57,7 +56,7 @@ if [ ! -f wp-config.php ]; then
 fi
 
 # ----------------------------------------------------------
-# Step 5: Install WordPress
+# Install WordPress
 # ----------------------------------------------------------
 
 if ! wp core is-installed --allow-root 2>/dev/null; then
@@ -74,11 +73,8 @@ if ! wp core is-installed --allow-root 2>/dev/null; then
 fi
 
 # ----------------------------------------------------------
-# Step 6: Create the second WordPress user
+# Create the second WordPress user
 # ----------------------------------------------------------
-# The subject requires exactly TWO users in the WordPress database.
-# Admin (WP_ADMIN_USER) was created in step 5.
-# This creates the author (WP_USER).
 
 if ! wp user get "${WP_USER}" --allow-root 2>/dev/null; then
     echo "Creating WordPress user: ${WP_USER}..."
@@ -91,7 +87,7 @@ fi
 
 
 # ----------------------------------------------------------
-# Step 8: Start php-fpm as PID 1
+# Start php-fpm as PID 1
 # ----------------------------------------------------------
 
 # Create the runtime directory php-fpm needs for its PID file and socket.
@@ -99,8 +95,4 @@ mkdir -p /run/php
 
 echo "Starting php-fpm..."
 
-# exec replaces this shell with php-fpm.
-# php-fpm becomes PID 1 — required for Docker signal handling and
-# for the restart: always policy to work correctly.
-# -F runs php-fpm in the foreground (no daemonise).
 exec php-fpm7.4 -F
